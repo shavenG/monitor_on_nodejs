@@ -95,7 +95,9 @@ function updatePageModeControls(page_record, enable) {
 // background page.
 function setPageCheckInterval(url, minutes) {
   var interval = (parseFloat(minutes) * 60 * 1000) || null;
-  setPageSettings(url, { check_interval: interval }, BG.scheduleCheck);
+  $.get("/services/setPageSettings",{url:url,settings:{ check_interval: interval }},function(){
+    // BG.scheduleCheck;
+  });
 }
 
 // Saves a regex or selector to a page's DB record given its URL. The mode
@@ -109,7 +111,7 @@ function setPageRegexOrSelector(url, mode, value) {
   if (mode != 'regex' && mode != 'selector') throw(new Error('Invalid mode.'));
 
   if (value === null)  {
-    setPageSettings(url, { mode: 'text', regex: null, selector: null });
+    $.get("/services/setPageSettings",{url:url,settings:{ mode: 'text', regex: null, selector: null }});
   } else {
     var is_regex = (mode == 'regex');
     var valid = value && (is_regex ? isValidRegex : isValidSelector)(value);
@@ -121,7 +123,7 @@ function setPageRegexOrSelector(url, mode, value) {
       } else {
         settings.selector = value;
       }
-      setPageSettings(url, settings);
+      $.get("/services/setPageSettings",{url:url,settings:settings});
     }
   }
 }
@@ -790,7 +792,7 @@ function initializePageModeSelector() {
     if ($(this).is(':checked')) {
       $('.mode_string', record).keyup();
     } else {
-      setPageSettings(url, { mode: 'text', regex: null, selector: null });
+      $.get("/services/setPageSettings",{url:url,settings:{ mode: 'text', regex: null, selector: null }});
     }
   });
 
@@ -835,7 +837,7 @@ function initializePageModeTester() {
           form.fadeIn();
 
           cleanAndHashPage(html, mode, mode_string, mode_string, function(crc) {
-            setPageSettings(url, { crc: crc });
+            $.get("/services/setPageSettings",{url:url,settings:{ crc: crc }});
           });
         });
       },

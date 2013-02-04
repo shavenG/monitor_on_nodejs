@@ -282,55 +282,6 @@ function getAllUpdatedPages(callback) {
   });
 }
 
-// Updates a page, specified by its URL with new settings, and calls the
-// callback once the update is applied. The settings object can contain any
-// number of valid page properties. Invalid properties will not result in a call
-// to the callback. An empty settings object will result in an immediate call to
-// the callback.
-
-function setPageSettings(url, settings, callback) {
-  var buffer = [];
-  var args = [];
-
-  for(var name in settings) {
-    buffer.push(name + ' = ?');
-    if(typeof(settings[name]) == 'boolean') {
-      settings[name] = new Number(settings[name]);
-    }
-    args.push(settings[name]);
-  }
-  args.push(url);
-
-  if(buffer) {
-    var query = 'UPDATE pages SET ' + buffer.join(', ') + ' WHERE url = ?';
-
-    executeSql(query, args, null, callback);
-  } else {
-    (callback || $.noop)();
-  }
-}
-
-// Registers a URL for monitoring and takes a snapshot of it. Redirects itself
-// to the background page if needed. Calls BG.scheduleCheck() then the callback
-// after the new page is successfully added (if it is). NOTE: If the supplied
-// page is already monitored, the callback is not called.
-
-function addPage(page, callback) {
-  if(window != BG) return BG.addPage(page, callback);
-
-  var query = "INSERT INTO pages(url, name, mode, regex, selector, \
-                                 check_interval, html, crc, updated, \
-                                 last_check, last_changed) \
-               VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-  executeSql(query, [
-  page.url, page.name || chrome_i18n_getMessage('untitled', page.url), page.mode || 'text', page.regex || null, page.selector || null, page.check_interval || null, page.html || '', page.crc || 0, page.updated ? 1 : 0, Date.now(), page.last_changed || null], null, function() {
-    BG.takeSnapshot();
-    BG.scheduleCheck();
-    (callback || $.noop)();
-  });
-}
-
 // Removes a page from the monitoring registry, then calls BG.scheduleCheck()
 // and the callback once the page is successfully removed (even if the page did
 // not exist in the first place.
@@ -351,6 +302,75 @@ function isPageMonitored(url, callback) {
     console.assert(count <= 1);
     (callback || $.noop)(count == 1);
   });
+}
+
+// Calculates the CRC of a page, after cleaning it, and calls the callback with
+// this CRC as an argument. If mode=regex and the regex parameter is set, the
+// page is cleaned by replacing it with all the matches of this regex. If
+// mode=selector and the selector parameter is set, the pages is cleaned by
+// replacing it with the outerHTML of all matches of that selector. Otherwise
+// cleaning means calling cleanHtmlPage() which pretty much extracts the text
+// out of the HTML (see the function for more details).
+function cleanAndHashPage(html, mode, regex, selector, callback) {
+  if (!callback) return;
+
+  function callBackWithCrc(result) {
+    callback(crc(result || ''));
+  }
+
+  if (mode == 'regex' && regex) {
+    findAndFormatRegexMatches(html, regex, callBackWithCrc);
+  } else if (mode == 'selector' && selector) {
+    findAndFormatSelectorMatches(html, selector, callBackWithCrc);
+  } else {
+    cleanHtmlPage(html, callBackWithCrc);
+  }
+}
+
+// Searches for all matches of selector in the body of the html string, formats
+// them into a single string, then calls the callback with the result as an
+// argument. If called with an invalid selector, the callback is called with a
+// null.
+function findAndFormatSelectorMatches(html, selector, callback) {
+  try {
+    var body = $('<body>').html(getStrippedBody(html));
+    var result = $(selector, body).map(function() {
+      return '"' + $('<div>').append(this).html() + '"';
+    }).get().join('\n');
+
+    (callback || $.noop)(result);
+  } catch (e) {
+    (callback || $.noop)(null);
+  }
+}
+
+// Searches for all matches of regex in text, formats them into a single string,
+// then calls the callback with the result as an argument. If matching the regex
+// takes more than REGEX_TIMEOUT, the matching is cancelled and the callback is
+// called with a null argument.
+function findAndFormatRegexMatches(text, regex, callback) {
+  if (!callback) return;
+  if (!regex) return callback('');
+
+  var called = false;
+  var worker = new Worker(REGEX_WORKER_PATH);
+
+  function finishMatching(result) {
+    if (!called) {
+      called = true;
+      worker.terminate();
+      (callback || $.noop)(result ? result.data : null);
+    }
+  }
+
+  worker.onmessage = finishMatching;
+  worker.postMessage(JSON.stringify({
+    command: 'run',
+    text: text,
+    regex: regex
+  }));
+
+  setTimeout(finishMatching, REGEX_TIMEOUT);
 }
 
 // Updates the HTML snapshot of the specified page, and calls the callback once

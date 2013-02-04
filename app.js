@@ -43,9 +43,7 @@ WATCHDOG_TOLERANCE = 12E4;
 var sqlite3 = require('sqlite3').verbose();
 db = new sqlite3.Database('databases/monitor.db');
 dao = require("monitor/dao.js");
-// dao = monitor.dao;
-// dao.setBG(monitor);
-console.log(this)
+
 app.get('/', routes.index);
 app.get('/users', user.list);
 
