@@ -244,9 +244,7 @@ function sqlResultToArray(result) {
 
 // 向url发送请求，后台执行查询指定url的数据
 function getPage(url, callback) {
-  $.get("/services/getPage", {
-    url: url
-  }, function(a) {
+  $.get("/services/getPage", {url: url}, function(a) {
     if(a != "") {
       callback(a);
     } else callback(null);
