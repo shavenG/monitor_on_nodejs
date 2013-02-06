@@ -214,19 +214,6 @@ function initializeStorage(callback) {
   executeSql(DATABASE_STRUCTURE, $.noop, callback);
 }
 
-// Executes the specified SQL query with the specified arguments within a
-// transaction. If resultCallback is specified, it is called with the result of
-// the query. If transactionCallback is specified, it is called after the
-// transaction is successful (if it is).
-
-function executeSql(sql, args, resultCallback, transactionCallback) {
-  DB.transaction(function(transaction) {
-    transaction.executeSql(sql, args, function(_, result) {
-      (resultCallback || $.noop)(result);
-    });
-  }, $.noop, (transactionCallback || $.noop));
-}
-
 // Converts an SQL result object into an ordinary array.
 
 function sqlResultToArray(result) {
@@ -284,23 +271,23 @@ function getAllUpdatedPages(callback) {
 // and the callback once the page is successfully removed (even if the page did
 // not exist in the first place.
 
-function removePage(url, callback) {
-  executeSql('DELETE FROM pages WHERE url = ?', [url], null, function() {
-    BG.scheduleCheck();
-    (callback || $.noop)();
-  });
-}
+// function removePage(url, callback) {
+//   executeSql('DELETE FROM pages WHERE url = ?', [url], null, function() {
+//     BG.scheduleCheck();
+//     (callback || $.noop)();
+//   });
+// }
 
 // Calls the callback with a boolean indicating whether the supplied URL is
 // being monitored.
 
-function isPageMonitored(url, callback) {
-  executeSql('SELECT COUNT(*) FROM pages WHERE url = ?', [url], function(result) {
-    var count = result.rows.item(0)['COUNT(*)'];
-    console.assert(count <= 1);
-    (callback || $.noop)(count == 1);
-  });
-}
+// function isPageMonitored(url, callback) {
+//   executeSql('SELECT COUNT(*) FROM pages WHERE url = ?', [url], function(result) {
+//     var count = result.rows.item(0)['COUNT(*)'];
+//     console.assert(count <= 1);
+//     (callback || $.noop)(count == 1);
+//   });
+// }
 
 // Calculates the CRC of a page, after cleaning it, and calls the callback with
 // this CRC as an argument. If mode=regex and the regex parameter is set, the
