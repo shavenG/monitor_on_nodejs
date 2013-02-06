@@ -20,7 +20,7 @@ function markPageVisited() {
   var url = getNotificationUrl(this);
   var that = this;
 
-  $.get("/services/setPageSettings",{url:url,settings:{ updated: false }},function() {
+  $.get("/services/setPageSettings",{url:url,settings:{ updated: 0 }},function() {
     // BG.updateBadge();
     // BG.takeSnapshot(url, BG.scheduleCheck);
 

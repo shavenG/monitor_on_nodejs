@@ -20,7 +20,7 @@ function makeLink(page) {
 
 // Marks an updated page as visited given its URL and reloads the notification.
 function markPageVisited(url) {
-  $.get("/services/setPageSettings",{url:url,settings:{ updated: false }},function() {
+  $.get("/services/setPageSettings",{url:url,settings:{ updated: 0 }},function() {
     // BG.updateBadge();
     // BG.takeSnapshot(url, BG.scheduleCheck);
     initialize();
