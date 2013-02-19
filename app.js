@@ -6,7 +6,8 @@ var express = require('express')
   , path = require('path')
   , url = require('url');
 
-BG = require('./lib/background.js')
+BG = require('./lib/background.js');
+SL = require('./lib/scanLinks.js');
 dao = require("./lib/dao.js");
 $ = require('jquery');
 
@@ -65,6 +66,7 @@ app.all('*',function(req, res, next){
 
 
 BG.watchdog();
+SL.startScan();
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
