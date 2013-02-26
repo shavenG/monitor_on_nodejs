@@ -128,6 +128,31 @@ function setPageRegexOrSelector(url, mode, value) {
   }
 }
 
+/**
+* LY MARKED
+*/
+function setArticleRegexOrSelector(url, modename, regexname, selectorname, mode, value) {
+  if (mode != 'regex' && mode != 'selector') throw(new Error('Invalid mode.'));
+
+  if (value === null)  {
+    $.get("/services/setPageSettings",{url:url,settings:{ modename: 'text', regex: null, selector: null }});
+  } else {
+    var is_regex = (mode == 'regex');
+    var valid = value && (is_regex ? isValidRegex : isValidSelector)(value);
+    updatePageModeControls(findPageRecord(url), valid);
+    if (valid) {
+      var settings = { modename: mode };
+      if (is_regex) {
+        settings.regex = value;
+      } else {
+        settings.selector = value;
+      }
+      $.get("/services/setPageSettings",{url:url,settings:settings});
+    }
+  }
+}
+
+
 /*******************************************************************************
 *                              Import & Export                                 *
 *******************************************************************************/
@@ -731,6 +756,14 @@ function initializePageAdvancedToggler() {
         var custom_mode_string = $('.mode_string', page_record).val();
         setPageRegexOrSelector(url, custom_mode, custom_mode_string);
       }
+
+      if ($('.page_title :checked', page_record).length > 0) {
+        var title_mode = $('.page_title select', page_record).val();
+        var title_mode_string = $('.page_title', page_record).val();
+        alert(title_mode+"===="+title_mode_string);
+        setPageRegexOrSelector(url, title_mode, title_mode_string);
+      }
+
     } else {
       $('.advanced_controls', page_record).slideUp('fast', function() {
         $('.advanced_toggle', page_record).removeClass('toggled');
@@ -806,6 +839,17 @@ function initializePageModeSelector() {
     var mode = $('select', findPageRecord(this)).val();
     setPageRegexOrSelector(findUrl(this), mode, $(this).val());
   }).live('change', function() { $(this).keyup(); });
+
+  $('.page_title select').live('change',function(){
+    var record = findPageRecord(this);
+    $('.title_string',record).keyup();
+    $('.title_pick',record).attr({disabled:$(this).val()=="regex"});
+  });
+
+  $('.title_string').live('keyup',function(){
+    var mode = $('select',findPageRecord(this)).val();
+    setArticleRegexOrSelector(findUrl(this), "title_mode", mode, $(this).val());
+  }).live('change',function(){$(this).keyup();});
 }
 
 // Initializes the custom monitoring mode test button. On click, the button
@@ -821,7 +865,7 @@ function initializePageModeTester() {
     var mode = $('select', record).val();
     var mode_string = $('.mode_string', record).val();
     var button = $(this);
-
+    alert("url:"+url+"\n record:"+record+"\n mode:"+mode+"\n mode_string:"+mode_string+"\n button:"+button);
     button.val(chrome_i18n_getMessage('test_progress'))
           .add($('.mode_string', record)).attr({ disabled: true });
 
