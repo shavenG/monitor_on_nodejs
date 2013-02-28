@@ -89,6 +89,11 @@ function updatePageModeControls(page_record, enable) {
   page_record.find('.mode .mode_test').attr({ disabled: !enable });
 }
 
+function updateTitleModeControls(page_record, enable) {
+  page_record.find('.mode .title_string').toggleClass('invalid', !enable);
+  page_record.find('.mode .title_test').attr({ disabled: !enable });
+}
+
 // Applies a per-page check interval to a page given its URL. The interval
 // should be a number in minutes or a null to disable custom interval for this
 // page. After the new value is applied, scheduleCheck() is called on the
@@ -107,50 +112,58 @@ function setPageCheckInterval(url, minutes) {
 // it is saved to the page record. If the value is non-null,
 // updatePageModeControls() is called with the validity of the value as the
 // enable argument.
-function setPageRegexOrSelector(url, mode, value) {
-  if (mode != 'regex' && mode != 'selector') throw(new Error('Invalid mode.'));
+function setPageRegexOrSelector(url, mode, value, modeext) {
+  if (mode != 'regex' && mode != 'selector' && mode!="text" ) throw(new Error('Invalid mode.'));
 
-  if (value === null)  {
-    $.get("/services/setPageSettings",{url:url,settings:{ mode: 'text', regex: null, selector: null }});
-  } else {
+  // if (value === null)  {
+  //   $.get("/services/setPageSettings",{url:url,settings:{ mode: 'text', regex: null, selector: null }});
+  // } else {
     var is_regex = (mode == 'regex');
     var valid = value && (is_regex ? isValidRegex : isValidSelector)(value);
-    updatePageModeControls(findPageRecord(url), valid);
-    if (valid) {
-      var settings = { mode: mode };
-      if (is_regex) {
-        settings.regex = value;
-      } else {
-        settings.selector = value;
-      }
-      $.get("/services/setPageSettings",{url:url,settings:settings});
+    if(value!=""){
+      updatePageModeControls(findPageRecord(url), valid);
     }
-  }
+    // if (valid) {
+
+      if(modeext!=null){
+        var settings = modeext;
+        settings["mode"] = mode;
+      }else{
+        var settings = { "mode": mode };
+      }
+      // if (is_regex) {
+      //   settings.regex = value;
+      // } else {
+      //   settings.selector = value;
+      // }
+      $.get("/services/setPageSettings",{url:url,settings:settings});
+    // }
+  // }
 }
 
 /**
-* LY MARKED
+* LYMARKED
 */
-function setArticleRegexOrSelector(url, modename, regexname, selectorname, mode, value) {
-  if (mode != 'regex' && mode != 'selector') throw(new Error('Invalid mode.'));
 
-  if (value === null)  {
-    $.get("/services/setPageSettings",{url:url,settings:{ modename: 'text', regex: null, selector: null }});
-  } else {
-    var is_regex = (mode == 'regex');
-    var valid = value && (is_regex ? isValidRegex : isValidSelector)(value);
-    updatePageModeControls(findPageRecord(url), valid);
-    if (valid) {
-      var settings = { modename: mode };
-      if (is_regex) {
-        settings.regex = value;
-      } else {
-        settings.selector = value;
-      }
-      $.get("/services/setPageSettings",{url:url,settings:settings});
-    }
-  }
-}
+//获取标题
+// function setArticleRegexOrSelector(url, mode, value,modeext) {
+//   if (mode != 'regex' && mode != 'selector') throw(new Error('Invalid mode.'));
+//   if(value!=null){
+//     var is_regex = (mode == 'regex');
+//     var valid = value && (is_regex ? isValidRegex : isValidSelector)(value);
+//     updateTitleModeControls(findPageRecord(url), valid);
+//     if (valid) {
+//       var settings = modeext;
+//       settings["title_mode"] = mode;
+//       if (is_regex) {
+//         settings.title_regex = value;
+//       } else {
+//         settings.title_selector = value;
+//       }
+//       $.get("/services/setPageSettings",{url:url,settings:settings});
+//     }
+//   }
+// }
 
 
 /*******************************************************************************
@@ -818,38 +831,52 @@ function initializePageCheckInterval() {
 // 3. The textbox calls setPageRegexOrSelector() with the appropriate arguments
 //    on keyup and change events.
 function initializePageModeSelector() {
-  $('.mode input[type=checkbox]').live('click', function() {
+  $('.mode input[type=checkbox],.ext_mode input[type=checkbox]').live('click', function() {
     var url = findUrl(this);
     var record = findPageRecord(this);
 
-    if ($(this).is(':checked')) {
-      $('.mode_string', record).keyup();
-    } else {
-      $.get("/services/setPageSettings",{url:url,settings:{ mode: 'text', regex: null, selector: null }});
-    }
+      $(this).parent().find('.mode_string').keyup();
   });
 
-  $('.mode select').live('change', function() {
+  $('.mode select,.ext_mode select').live('change', function() {
     var record = findPageRecord(this);
-    $('.mode_string', record).keyup();
-    $('.mode_pick', record).attr({ disabled: $(this).val() == 'regex' });
+    $(this).parent().find('.mode_string', record).keyup();
+    $(this).parent().find('.mode_pick', record).attr({ disabled: $(this).val() == 'regex' });
   });
 
-  $('.mode_string').live('keyup', function() {
-    var mode = $('select', findPageRecord(this)).val();
-    setPageRegexOrSelector(findUrl(this), mode, $(this).val());
-  }).live('change', function() { $(this).keyup(); });
+  // $('.mode_string').live('keyup', function() {
+  $('#saveinfo').live('click',function() {
+    var ppp = $(this).parent().parent().parent();
+    var mode = ppp.find(".mode input[type=checkbox]").is(':checked')?ppp.find('.mode select').val():"text";
+    var value = ppp.find(".mode input[type=checkbox]").is(':checked')?ppp.find(".mode_string").val():"";
 
-  $('.page_title select').live('change',function(){
-    var record = findPageRecord(this);
-    $('.title_string',record).keyup();
-    $('.title_pick',record).attr({disabled:$(this).val()=="regex"});
+    var mode_obj = {
+      title_mode:ppp.find(".page_title input[type=checkbox]").is(':checked')?ppp.find(".page_title select").val():"",
+      author_mode:ppp.find(".page_author input[type=checkbox]").is(':checked')?ppp.find(".page_author select").val():"",
+      content_mode:ppp.find(".page_content input[type=checkbox]").is(':checked')?ppp.find(".page_content select").val():"text",
+      keyword_mode:ppp.find(".page_keyword input[type=checkbox]").is(':checked')?ppp.find(".page_keyword select").val():""
+    };
+
+    mode_obj["title_"+mode_obj["title_mode"]] = ppp.find(".page_title input[type=checkbox]").is(':checked')?ppp.find(".page_title .mode_string").val():"";
+    mode_obj["author_"+mode_obj["author_mode"]] = ppp.find(".page_author input[type=checkbox]").is(':checked')?ppp.find(".page_author .mode_string").val():"";
+    mode_obj["content_"+mode_obj["content_mode"]] = ppp.find(".page_content input[type=checkbox]").is(':checked')?ppp.find(".page_content .mode_string").val():"";
+    mode_obj["keyword_"+mode_obj["keyword_mode"]] = ppp.find(".page_keyword input[type=checkbox]").is(':checked')?ppp.find(".page_keyword .mode_string").val():"";
+    // alert(mode)
+    delete(mode_obj["title_"]);
+    delete(mode_obj["author_"]);
+    delete(mode_obj["keyword_"]);
+    delete(mode_obj["content_text"]);
+
+    mode_obj["updated"] = 0;
+
+    setPageRegexOrSelector(findUrl(this), mode, value, mode_obj);
+  // }).live('change', function() { $(this).keyup(); });
   });
+  
+  // $('#stop').click(function(){
 
-  $('.title_string').live('keyup',function(){
-    var mode = $('select',findPageRecord(this)).val();
-    setArticleRegexOrSelector(findUrl(this), "title_mode", mode, $(this).val());
-  }).live('change',function(){$(this).keyup();});
+  // });
+
 }
 
 // Initializes the custom monitoring mode test button. On click, the button
@@ -865,33 +892,18 @@ function initializePageModeTester() {
     var mode = $('select', record).val();
     var mode_string = $('.mode_string', record).val();
     var button = $(this);
-    alert("url:"+url+"\n record:"+record+"\n mode:"+mode+"\n mode_string:"+mode_string+"\n button:"+button);
     button.val(chrome_i18n_getMessage('test_progress'))
           .add($('.mode_string', record)).attr({ disabled: true });
 
-    $.ajax({
-      url: url,
-      dataType: 'text',
-      success: function(html) {
-        var findAndFormat = (mode == 'regex') ? findAndFormatRegexMatches :
-                                                findAndFormatSelectorMatches;
-        findAndFormat(html, mode_string, function(results) {
-          $('textarea', form).val(results);
+    $.get('/services/getPageContent',{'url':url,'mode':$(this).parent().find('select').val(),'mode_string':$(this).parent().find('.mode_string').val()}, function(html) {
+          $('textarea', form).val(html);
           shadeBackground(true);
           form.fadeIn();
+          button.val(chrome_i18n_getMessage('test_button')).add($('.mode_string', record)).attr({ disabled: false });
 
           cleanAndHashPage(html, mode, mode_string, mode_string, function(crc) {
             $.get("/services/setPageSettings",{url:url,settings:{ crc: crc }});
-          });
         });
-      },
-      error: function() {
-        alert(chrome_i18n_getMessage('test_fail'));
-      },
-      complete: function() {
-        button.val(chrome_i18n_getMessage('test_button'))
-              .add($('.mode_string', record)).attr({ disabled: false });
-      }
     });
   });
 
@@ -1095,13 +1107,6 @@ function selectorServer(request, _, callback) {
   }
 }
 
-
-/*******************************************************************************
-*                                    BY LU                                     *
-*******************************************************************************/
-
-(function(){})();
-
 /*******************************************************************************
 *                               Main Function                                  *
 *******************************************************************************/
@@ -1122,3 +1127,8 @@ function init() {
 
   fillPagesList();
 }
+/*******************************************************************************
+*                                    BY LU                                     *
+*******************************************************************************/
+
+(function(){})();

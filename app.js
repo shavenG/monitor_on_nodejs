@@ -6,10 +6,13 @@ var express = require('express')
   , path = require('path')
   , url = require('url');
 
+$ = require('jquery');
+
+
+
 BG = require('./lib/background.js');
 SL = require('./lib/scanLinks.js');
 dao = require("./lib/dao.js");
-$ = require('jquery');
 
 var app = express();
 
@@ -70,11 +73,11 @@ app.all('/2',function(req, res){
 
 app.all('/r/*',function(req, res){
   var s = ["录",12,2,3,214,"晨",213123,325,2345,435,34,5435];
-  res.send('<html><body>this is ' + req.originalUrl+'<br /><a href="r/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>' + '<a href="/r/gen/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>'+'<a href="http://127.0.0.1:3000/r/wanzheng/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a></body></html>');
+  res.send('<html><body>this is ' + req.originalUrl+'<br /> <a href="r/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>' + '<a href="/r/gen/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>'+'<a href="http://127.0.0.1:3000/r/wanzheng/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a></body></html>');
 });
 
-BG.watchdog();
-SL.startScan();
+// BG.watchdog();
+// SL.startScan();
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
