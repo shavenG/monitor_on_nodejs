@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Page Monitor Options</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <script type="text/javascript" src="lib/jquery-1.4.1.js"></script>
+  <script type="text/javascript" src="lib/jquery.colorPicker.js"></script>
+  <script type="text/javascript" src="_locales/zh_CN/messages.js"></script>
+  <script type="text/javascript" src="scripts/fix.js"></script>
+  <script type="text/javascript" src="scripts/base.js"></script>
+  <script type="text/javascript" src="scripts/options.js"></script>
+  <style type="text/css">
+.mode_string
+{
+  width:64px;
+}
+.ext_mode, .mode
+{
+  padding-right: 20px;
+}
+.mode_string
+{
+  width:80px;
+}
+
+#test_result_form {
+  display: none;
+  position: fixed;
+  top: 20%;
+  border: 1px gray solid;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 60%;
+  z-index: 3;
+  margin:20% 20%;
+}
+
+#test_result_form textarea {
+  display: block;
+  width: 100%;
+  min-height: 200px;
+  margin-top: 10px;
+  white-space: nowrap;
+  resize: none;
+}
+
+#test_result_form button {
+  display: block;
+  margin-top: 10px;
+  margin-left: 20px;
+  margin-right: -7px;
+  margin-bottom: -6px;
+  float: right;
+}
+#shader {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  overflow: hidden;
+  z-index: 2;
+  background: #000000;
+  opacity: 0;
+}
+
+</style>
+<script type="text/javascript">
+var isPxFrame= true;
+
+function findUrl(context) {
+  return $('#urlinput').val();
+}
+
+
+function ifonloader() {
+  var myIframe = document.getElementById("mainiframe");
+  $.get('/scripts/selector.js', function(content) {
+    var script = myIframe.contentWindow.document.createElement("script");
+    script.type = "text/javascript";
+    script.innerHTML = content;
+    myIframe.contentWindow.document.body.appendChild(script);
+    window.frames['mainiframe'].initialize();
+  });
+
+  $.get('/styles/selector.css', function(content) {
+    var css = myIframe.contentWindow.document.createElement("style");
+    css.type = "text/css";
+    css.innerHTML = content;
+    myIframe.contentWindow.document.body.appendChild(css);
+  });
+}
+$(function(){
+  initializePageModeTester();
+  $(".mode_pick").click(function(){
+    window.frames['mainiframe'].startget($(this).parent().parent().attr("class"));
+    // alert($(window.frames['mainiframe']).parent());
+  });
+  $("#pxysave").click(updateSettingDo);
+})
+</script>
+</head>
+<body>
+  <a name="to$" id="to$"></a>
+  <div style='border-bottom:1px solid #999999;'>
+    <input id='urlinput' type='text' value='http://www.baidu.com' style="width:678px"/>
+    <input type='button' onclick="$('.mode_string').val('');$('#mainiframe').attr('src','/proxy/'+$('#urlinput').val())" value='转到' style='margin-right:50px' />
+    链接:
+    <span class="wo mode">
+      <span class="disabled">
+      <select >
+        <option value="text" class="i18n" title="selector">自动</option>
+        <option value="selector" class="i18n" title="selector">选择器</option>
+        <option value="regex" class="i18n" title="regex">正则</option>
+      </select>
+      <input type="text"  class="mode_string" />
+      <input type="button" value="测试" class="mode_test" />
+      <input type="button" value="提取" class="mode_pick" />
+      </span>
+    </span>
+    <br />
+    <span class="ext_mode page_title">
+      <span class="disabled">
+        标题:　
+        <select>
+          <option value="" class="i18n" title="selector">自动</option>
+          <option value="selector" class="i18n" title="selector">选择器</option>
+          <option value="regex" class="i18n" title="regex">正则</option>
+        </select>
+        <input type="text" class="mode_string" />
+        <input type="button" value="测试" class="mode_test" />
+        <input type="button" value="提取" class="mode_pick" />
+      </span>
+    </span>
+    <span class="ext_mode page_content">
+      <span class="disabled">正文:
+      <select>
+        <option value="text" class="i18n" title="selector">自动</option>
+        <option value="selector" class="i18n" title="selector">选择器</option>
+        <option value="regex" class="i18n" title="regex">正则</option>
+      </select>
+      <input type="text" class="mode_string" />
+      <input type="button" value="测试" class="mode_test" />
+      <input type="button" value="提取" class="mode_pick" />
+      </span>
+    </span>
+    <span class="ext_mode page_author">
+      <span class="disabled">
+        作者:
+        <select>
+          <option value="" class="i18n" title="selector">自动</option>
+          <option value="selector" class="i18n" title="selector">选择器</option>
+          <option value="regex" class="i18n" title="regex">正则</option>
+        </select>
+        <input type="text" class="mode_string" />
+        <input type="button" value="测试" class="mode_test" />
+        <input type="button" value="提取" class="mode_pick" />
+      </span>
+    </span>
+    <br />
+
+    <span class="ext_mode page_keyword">
+      <span class="disabled">关键词:
+      <select>
+        <option value="" class="i18n" title="selector">自动</option>
+        <option value="selector" class="i18n" title="selector">选择器</option>
+        <option value="regex" class="i18n" title="regex">正则</option>
+      </select>
+      <input type="text" class="mode_string" />
+      <input type="button" value="测试" class="mode_test" />
+      <input type="button" value="提取" class="mode_pick" />
+      </span>
+    </span>
+    <!-- <span class="ext_mode page_time">
+      <span class="disabled">时间:
+      <select>
+        <option value="" class="i18n" title="selector">自动</option>
+        <option value="selector" class="i18n" title="selector">选择器</option>
+        <option value="regex" class="i18n" title="regex">正则</option>
+      </select>
+      <input type="text" class="mode_string" />
+      <input type="button" value="测试" class="mode_test" />
+      <input type="button" value="提取" class="mode_pick" />
+      </span>
+    </span> -->
+    <input type='button' id="pxysave" value='保存' style='float:right;' />
+  </div>
+
+  <div id="test_result_form">
+    <span title="test_matches">已匹配：</span>
+    <textarea rows="10" cols="80" readonly="readonly">...</textarea>
+    <button><span title="close">关闭</span></button>
+  </div>
+  <iframe id='mainiframe' name='mainiframe' src='/proxy/http://www.baidu.com/' onload='ifonloader()'
+  style='position:absolute; left:0; top:96; height:100%; width:100%; border:0px;z-index:1'/>
+
+
+</body>
+</html>

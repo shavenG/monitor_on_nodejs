@@ -1,12 +1,15 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
+  "name": "monitor_on_nodejs",
+  "version": "0.0.2",
   "private": true,
   "main": "app",
   "dependencies": {
     "express": "3.1.0",
     "jade": "*",
     "connect": 	"*",
-    "iconv":	"1.1.x"
+    "iconv":	"1.1.x",
+    "feed": "*",
+    "feedparser": "*",
+  	"jquery": "*"
   }
 }

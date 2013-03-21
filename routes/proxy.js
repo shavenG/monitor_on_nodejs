@@ -62,7 +62,6 @@ var charset_aliases_iconv = {
 */
 exports.proxy = function (request, response) {
 	var uri = url.parse(getRealUrl(request.url));
-
 	// redirect urls like /proxy/http://asdf.com to /proxy/http://asdf.com/ to make relative image paths work
 	if (uri.pathname == "/" && request.url.substr(-1) != "/") {
 		return redirectTo(request, response, request.url + "/");

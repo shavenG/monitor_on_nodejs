@@ -8,10 +8,8 @@ var express = require('express')
 
 $ = require('jquery');
 
-
-
 BG = require('./lib/background.js');
-SL = require('./lib/scanLinks.js');
+var scan_url_server = require('./lib/scanLinks.js');
 dao = require("./lib/dao.js");
 
 var app = express();
@@ -40,13 +38,15 @@ app.configure('development', function(){
 });
 
 RELIABLE_CHECKPOINT = "http://www.baidu.com/";
-DEFAULT_CHECK_INTERVAL = 108E5;
+// DEFAULT_CHECK_INTERVAL = 108E5;
+DEFAULT_CHECK_INTERVAL = 18E5;
 RESCHEDULE_DELAY = 9E5;
-MINIMUM_CHECK_SPACING = 1E3;
+MINIMUM_CHECK_SPACING = 100;
 BROWSER_ICON = "img/browser_icon.png";
 EPSILON = 500;
 WATCHDOG_INTERVAL = 9E5;
 WATCHDOG_TOLERANCE = 12E4;
+MAX_CONNECT_COUNT = 50;
 
 var sqlite3 = require('sqlite3').verbose();
 db = new sqlite3.Database('databases/monitor.db');
@@ -67,17 +67,13 @@ app.all('*',function(req, res, next){
   next();
 });
 
-app.all('/2',function(req, res){
-  res.send(404);
-});
-
 app.all('/r/*',function(req, res){
   var s = ["录",12,2,3,214,"晨",213123,325,2345,435,34,5435];
   res.send('<html><body>this is ' + req.originalUrl+'<br /> <a href="r/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>' + '<a href="/r/gen/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>'+'<a href="http://127.0.0.1:3000/r/wanzheng/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a></body></html>');
 });
 
-// BG.watchdog();
-// SL.startScan();
+BG.watchdog();
+scan_url_server.startScan();
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

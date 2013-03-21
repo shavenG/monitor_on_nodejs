@@ -312,6 +312,44 @@ function cleanAndHashPage(html, mode, regex, selector, callback) {
   }
 }
 
+
+// Extract the text out of the HTML page, then calls the callback with the
+// result as an argument. If no callback is provided, simply returns the result.
+// The extraction includes:
+// 1. Trimming everything outside of <body> through getStrippedBody().
+// 2. Removing the contents of script, style, object, embed and applet tags.
+// 3. Replacing images with their src, surrounded by "startimg" and "endimg".
+// 4. Removing all tags.
+// 5. Removing time, date and cardinality number suffixes (1st, 5pm, 3 weeks).
+// 6. Removing all ASCII non-letter characters.
+// 7. Casting all the result into lowercase.
+
+function cleanHtmlPage(html, callback) {
+  html = html.toLowerCase();
+  // Get rid of everything outside the body.
+  html = getStrippedBody(html);
+  // Remove major non-text elements.
+  html = html.replace(/<(script|style|object|embed|applet)[^>]*>[^]*?<\/\1>/g, '');
+  // Replace images with their sources (to preserve after tag stripping).
+  html = html.replace(/<img[^>]*src\s*=\s*['"]?([^<>"' ]+)['"]?[^>]*>/g, '{startimg:$1:endimg}');
+  // Strip tags.
+  html = html.replace(/<[^>]*>/g, '');
+  // Collapse whitespace.
+  html = html.replace(/\s+/g, ' ');
+  // Unescape HTML entities (&nbsp;, &amp;, numeric unicode entities, etc.).
+  html = $('<div/>').html(html).text();
+  // Remove numbers with common number suffixes. This helps with pages that
+  // print out the current date/time or time since an item was posted.
+  html = html.replace(/\d+ ?(st|nd|rd|th|am|pm|seconds?|minutes?|hours?|days?|weeks?|months?)\b/g, '');
+  // Remove everything other than letters (unicode letters are preserved).
+  html = html.replace(/[\x00-@[-`{-\xBF]/g, '');
+
+  if(callback) {
+    callback(html);
+  } else {
+    return html;
+  }
+}
 // Searches for all matches of selector in the body of the html string, formats
 // them into a single string, then calls the callback with the result as an
 // argument. If called with an invalid selector, the callback is called with a

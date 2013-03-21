@@ -26,22 +26,52 @@ exports.getAllUpdatedPages = function(req, res) {
 
 exports.setPageSettings = function(req, res) {
     dao.setPageSettings(req.query.url, req.query.settings, function() {
+        BG.scheduleCheck();
         res.send("success");
     });
 }
 
-exports.getPageContent = function(req, res) {
+exports.addPage = function(req, res) {
+    dao.addPage(req.query.page, function() {
+        res.send("success");
+    });
+};
+
+exports.removePage = function(req, res) {
+    dao.removePage(req.query.url, function() {
+        res.send("success");
+    });
+};
+
+exports.getPageContent = function(req, res, sub) {
     var url = req.query.url;
     var mode = req.query.mode;
     var mode_string = req.query.mode_string;
+    var ex_mode = req.query.ex_mode;
+    var ex_string = req.query.ex_string;
+    // var sub = req.query.sub;
+    // console.log(sub)
     $.get(url, function(html) {
-        var findAndFormat = (mode == 'regex') ? BG.findAndFormatRegexMatches : BG.findAndFormatSelectorMatches;
-        findAndFormat(html, mode_string, function(results) {
-           var decodeIconv = new Iconv('GBK', 'UTF-8//TRANSLIT//IGNORE');
-            var buffer = decodeIconv.convert(results).toString();
-
-            console.log(buffer);
-            res.send(buffer);
+        // console.log(html.length, mode, mode_string, mode_string);
+        BG.cleanPage(html, mode, mode_string, mode_string, function(results) {
+            if(sub) return res.send(results);
+            BG.getLinksInHtml(results,url,function(links) {
+                if(req.query.sub){
+                    if(links.length>0){
+                        req.query = {"url":links[0].link,"mode":ex_mode,"mode_string":ex_string};
+                        exports.getPageContent(req,res,true);
+                    }else{
+                        res.send("无法找到链接");
+                    }
+                }else{
+                    var result = "";
+                    for(var link_id in links){
+                        result += links[link_id].title + " ： " + links[link_id].link + "\r\n";
+                    }
+                    res.send(result);
+                }
+            });
+            // console.log(links.length,links);
         });
     });
 }

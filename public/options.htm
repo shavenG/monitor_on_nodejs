@@ -15,12 +15,20 @@
     <script type="text/javascript">
       $(init);
     </script>
+    <style type="text/css">
+      .mode_pick {
+        display: none;
+      }
+      .ext_mode {
+        color:#849CCB;
+      }
+    </style>
   </head>
   <body>
     <h1><span class="i18n" title="options_header"></span></h1>
 
     <!-- Templates for the page table. -->
-
+<div style="display:none;"><input type="text" name="url" id="urladd" /><input type="button" name="submit_url" id="submit_url" value="SUBMIT" /></div>
     <table id="templates">
       <tr class="page_record">
         <td>
@@ -31,8 +39,9 @@
           <div class="page_controls">
             <span class="advanced_toggle">
               <label>
-                <input type="checkbox" />
+                &nbsp;
                 <span class="i18n" title="advanced"></span>
+                &nbsp;
               </label>
             </span>
             <span class="rename">
@@ -51,71 +60,87 @@
             </span>
             <div class="advanced_controls">
               <div class="page_interval">
-                <input type="checkbox" />
-                <span class="disabled">
+                <span>
                   <span class="i18n" title="check_every"></span>:
-                  <input type="range" disabled="disabled" min="-6" max="20" step="0.01" />
+                  <input type="range" min="-6" max="20" step="0.01" />
                   <label class="range_value_label"></label>
                 </span>
               </div>
               <div class="mode">
-                <input type="checkbox" />
-                <span class="disabled">
+                <span>
                   <span class="i18n" title="custom_mode"></span>:
-                  <select disabled="disabled">
+                  <select>
+                    <option value="text" title="selector">自动</option>
                     <option value="selector" class="i18n" title="selector"></option>
                     <option value="regex" class="i18n" title="regex"></option>
                   </select>
-                  <input type="text" disabled="disabled" class="mode_string" />
-                  <input type="button" disabled="disabled" value="Test" class="mode_test" />
-                  <input type="button" disabled="disabled" value="Pick" class="mode_pick" />
+                  <input type="text" class="mode_string" />
+                  <input type="button" value="Test" class="mode_test" />
+                  <input type="button" value="Pick" class="mode_pick" />
                 </span>
               </div>
               <div class="ext_mode page_title">
-                <input type="checkbox" />
-                <span class="disabled">标题：</span>
-                <select disabled="disabled">
+                <span>标题:　　　
+                  <select>
+                    <option value="" title="selector">自动</option>
                     <option value="selector" class="i18n" title="selector"></option>
                     <option value="regex" class="i18n" title="regex"></option>
                   </select>
-                  <input type="text" disabled="disabled" class="mode_string" />
-                  <input type="button" disabled="disabled" value="Test" class="mode_test" />
-                  <input type="button" disabled="disabled" value="Pick" class="mode_pick" />
+                  <input type="text" class="mode_string" />
+                  <input type="button" value="Test" class="mode_test" />
+                  <input type="button" value="Pick" class="mode_pick" />
+                </span>
               </div>
-              <div class="ext_mode page_author">
-                <input type="checkbox" />
-                <span class="disabled">作者：</span>
-                <select disabled="disabled">
-                    <option value="selector" class="i18n" title="selector"></option>
-                    <option value="regex" class="i18n" title="regex"></option>
-                  </select>
-                  <input type="text" disabled="disabled" class="mode_string" />
-                  <input type="button" disabled="disabled" value="Test" class="mode_test" />
-                  <input type="button" disabled="disabled" value="Pick" class="mode_pick" />
-              </div>
+   
               <div class="ext_mode page_content">
-                <input type="checkbox" />
-                <span class="disabled">正文：</span>
-                <select disabled="disabled">
+                <span>正文:　　　
+                <select>
+                    <option value="text" title="selector">自动</option>
                     <option value="selector" class="i18n" title="selector"></option>
                     <option value="regex" class="i18n" title="regex"></option>
                   </select>
-                  <input type="text" disabled="disabled" class="mode_string" />
-                  <input type="button" disabled="disabled" value="Test" class="mode_test" />
-                  <input type="button" disabled="disabled" value="Pick" class="mode_pick" />
+                  <input type="text" class="mode_string" />
+                  <input type="button" value="Test" class="mode_test" />
+                  <input type="button" value="Pick" class="mode_pick" />
+                </span>
+              </div>
+                <div class="ext_mode page_author">
+                <span>作者:　　　
+                  <select>
+                    <option value="" title="selector">自动</option>
+                    <option value="selector" class="i18n" title="selector"></option>
+                    <option value="regex" class="i18n" title="regex"></option>
+                  </select>
+                  <input type="text" class="mode_string" />
+                  <input type="button" value="Test" class="mode_test" />
+                  <input type="button" value="Pick" class="mode_pick" />
+                </span>
               </div>
               <div class="ext_mode page_keyword">
-                <input type="checkbox" />
-                <span class="disabled">关键词：</span>
-                <select disabled="disabled">
+                <span>关键词:　　
+                  <select>
+                    <option value="" title="selector">自动</option>
                     <option value="selector" class="i18n" title="selector"></option>
                     <option value="regex" class="i18n" title="regex"></option>
                   </select>
-                  <input type="text" disabled="disabled" class="mode_string" />
-                  <input type="button" disabled="disabled" value="Test" class="mode_test" />
-                  <input type="button" disabled="disabled" value="Pick" class="mode_pick" />
+                  <input type="text" class="mode_string" />
+                  <input type="button" value="Test" class="mode_test" />
+                  <input type="button" value="Pick" class="mode_pick" />
+                </span>
               </div>
-              <div style="text-align:center;"><button id="saveinfo" style="margin:10px auto;">保存</button></div>
+              <!-- <div class="ext_mode page_time">
+                <span>时间:　　　
+                  <select>
+                    <option value="" title="selector">自动</option>
+                    <option value="selector" class="i18n" title="selector"></option>
+                    <option value="regex" class="i18n" title="regex"></option>
+                  </select>
+                  <input type="text" class="mode_string" />
+                  <input type="button" value="Test" class="mode_test" />
+                  <input type="button" value="Pick" class="mode_pick" />
+                </span>
+              </div> -->
+              <div style="text-align:center;"><button class="saveinfo" style="margin:10px auto;">保存</button></div>
             </div>
           </div>
         </td>

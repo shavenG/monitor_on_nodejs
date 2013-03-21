@@ -48,7 +48,7 @@ function shadeBackground(show) {
 
 // Returns the URL of the page record given any element in it.
 function findUrl(context) {
-  return $(context).closest('.page_record').find('.page_link').get(0).href;
+  return $($(context).closest('.page_record').find('.page_link').get(0)).attr('href');
 }
 
 // Returns a jQuery-wrapped page_record element which contains the specified
@@ -124,19 +124,19 @@ function setPageRegexOrSelector(url, mode, value, modeext) {
       updatePageModeControls(findPageRecord(url), valid);
     }
     // if (valid) {
-
-      if(modeext!=null){
-        var settings = modeext;
-        settings["mode"] = mode;
-      }else{
-        var settings = { "mode": mode };
-      }
-      // if (is_regex) {
-      //   settings.regex = value;
-      // } else {
-      //   settings.selector = value;
-      // }
-      $.get("/services/setPageSettings",{url:url,settings:settings});
+    var settings;
+    if(modeext!=null){
+      settings = modeext;
+    }
+    settings["mode"] = mode;
+        
+    if (is_regex) {
+      settings.regex = value;
+    } else if(mode =='selector') {
+      settings.selector = value;
+    }
+    
+    $.get("/services/setPageSettings",{url:url,settings:settings});
     // }
   // }
 }
@@ -693,7 +693,8 @@ function initializePageRename() {
 
       ok_button.click(function() {
         page_link.text(textbox.val());
-        setPageSettings(findUrl(this), { name: textbox.val() });
+        // setPageSettings(findUrl(this), { name: textbox.val() });
+        $.get("/services/setPageSettings",{url:findUrl(this),settings:{name:textbox.val()}});
         cancel_button.click();
       });
     }
@@ -706,8 +707,14 @@ function initializePageRename() {
 function initializePageRemove() {
   $('.stop_monitoring').live('click', function() {
     var url = findUrl(this);
+    // alert(url);
+    // if(url.substr(-1)!="/")
+    // removePage(url, BG.updateBadge);
+    $.get("/services/removePage",{url:url},function(mess) {
+      if(mess=="success") {
 
-    removePage(url, BG.updateBadge);
+      }
+    });
 
     var scroll_position = scrollY;
 
@@ -761,7 +768,7 @@ function initializePageAdvancedToggler() {
       if ($(':checked', interval_div).length > 0) {
         var interval_log = $('input[type=range]', interval_div).val();
         var interval = timeLogToAbsolute(interval_log);
-        setPageCheckInterval(url, interval);
+        //setPageCheckInterval(url, interval);
       }
 
       if ($('.mode :checked', page_record).length > 0) {
@@ -782,7 +789,7 @@ function initializePageAdvancedToggler() {
         $('.advanced_toggle', page_record).removeClass('toggled');
       });
 
-      setPageCheckInterval(url, null);
+      //setPageCheckInterval(url, null);
       setPageRegexOrSelector(url, 'regex', null);
     }
   });
@@ -807,9 +814,9 @@ function initializePageCheckInterval() {
     if ($(this).is(':checked')) {
       var interval_log = $('input[type=range]', $(this).parent()).val();
       var interval = timeLogToAbsolute(parseFloat(interval_log));
-      setPageCheckInterval(url, interval);
+      //setPageCheckInterval(url, interval);
     } else {
-      setPageCheckInterval(url, null);
+      //setPageCheckInterval(url, null);
     }
   });
 
@@ -818,7 +825,7 @@ function initializePageCheckInterval() {
     $(this).siblings('.range_value_label').text(describeTime(val_ms));
   }).live('mouseup', function() {
     var val = timeLogToAbsolute(parseFloat($(this).val()));
-    setPageCheckInterval(findUrl(this), val);
+    //setPageCheckInterval(findUrl(this), val);
   });
 }
 
@@ -845,39 +852,57 @@ function initializePageModeSelector() {
   });
 
   // $('.mode_string').live('keyup', function() {
-  $('#saveinfo').live('click',function() {
-    var ppp = $(this).parent().parent().parent();
-    var mode = ppp.find(".mode input[type=checkbox]").is(':checked')?ppp.find('.mode select').val():"text";
-    var value = ppp.find(".mode input[type=checkbox]").is(':checked')?ppp.find(".mode_string").val():"";
-
-    var mode_obj = {
-      title_mode:ppp.find(".page_title input[type=checkbox]").is(':checked')?ppp.find(".page_title select").val():"",
-      author_mode:ppp.find(".page_author input[type=checkbox]").is(':checked')?ppp.find(".page_author select").val():"",
-      content_mode:ppp.find(".page_content input[type=checkbox]").is(':checked')?ppp.find(".page_content select").val():"text",
-      keyword_mode:ppp.find(".page_keyword input[type=checkbox]").is(':checked')?ppp.find(".page_keyword select").val():""
-    };
-
-    mode_obj["title_"+mode_obj["title_mode"]] = ppp.find(".page_title input[type=checkbox]").is(':checked')?ppp.find(".page_title .mode_string").val():"";
-    mode_obj["author_"+mode_obj["author_mode"]] = ppp.find(".page_author input[type=checkbox]").is(':checked')?ppp.find(".page_author .mode_string").val():"";
-    mode_obj["content_"+mode_obj["content_mode"]] = ppp.find(".page_content input[type=checkbox]").is(':checked')?ppp.find(".page_content .mode_string").val():"";
-    mode_obj["keyword_"+mode_obj["keyword_mode"]] = ppp.find(".page_keyword input[type=checkbox]").is(':checked')?ppp.find(".page_keyword .mode_string").val():"";
-    // alert(mode)
-    delete(mode_obj["title_"]);
-    delete(mode_obj["author_"]);
-    delete(mode_obj["keyword_"]);
-    delete(mode_obj["content_text"]);
-
-    mode_obj["updated"] = 0;
-
-    setPageRegexOrSelector(findUrl(this), mode, value, mode_obj);
-  // }).live('change', function() { $(this).keyup(); });
-  });
+  $('.saveinfo').live('click',updateSettingDo);
   
   // $('#stop').click(function(){
 
   // });
 
 }
+
+function updateSettingDo(event) {
+    var ppp = $(event.target).parent().parent().parent();
+    var mode = ppp.find('.mode select').val();
+    var value = ppp.find(".mode_string").val();
+
+    var mode_obj = {
+      title_mode:ppp.find(".page_title select").val(),
+      author_mode:ppp.find(".page_author select").val(),
+      content_mode:ppp.find(".page_content select").val(),
+      keyword_mode:ppp.find(".page_keyword select").val(),
+      // time_mode:ppp.find(".page_time select").val(),
+      check_interval:parseFloat(timeLogToAbsolute(parseFloat(ppp.find(".page_interval input[type=range]").val()))) * 60 * 1000,
+      updated:0,
+    };
+// alert(timeLogToAbsolute(parseFloat(ppp.find(".page_interval input[type=range]").val())))
+    var url = '';
+    if(typeof(isPxFrame)!='undefined') 
+    {
+      var myIframe = document.getElementById("mainiframe");
+      mode_obj['name']= myIframe.contentWindow.document.title;
+      url=$('#urlinput').val();
+    }
+    else
+    {
+      mode_obj['name'] = ppp.parent().find('.page_link').text();
+      url=findUrl(this);
+    }
+
+    mode_obj["title_"+mode_obj["title_mode"]] = ppp.find(".page_title .mode_string").val();
+    mode_obj["author_"+mode_obj["author_mode"]] = ppp.find(".page_author .mode_string").val();
+    mode_obj["content_"+mode_obj["content_mode"]] = ppp.find(".page_content .mode_string").val();
+    // mode_obj["time_"+mode_obj["time_mode"]] = ppp.find(".page_time  .mode_string").val();
+    mode_obj["keyword_"+mode_obj["keyword_mode"]] = ppp.find(".page_keyword .mode_string").val();
+    // alert(mode)
+    delete(mode_obj["title_"]);
+    delete(mode_obj["author_"]);
+    delete(mode_obj["keyword_"]);
+    // delete(mode_obj["time_"]);
+    delete(mode_obj["content_text"]);
+
+    setPageRegexOrSelector(url, mode, value, mode_obj);
+  // }).live('change', function() { $(this).keyup(); });
+  }
 
 // Initializes the custom monitoring mode test button. On click, the button
 // disables itself and the textbox, runs a test with the currently specified
@@ -894,16 +919,26 @@ function initializePageModeTester() {
     var button = $(this);
     button.val(chrome_i18n_getMessage('test_progress'))
           .add($('.mode_string', record)).attr({ disabled: true });
-
-    $.get('/services/getPageContent',{'url':url,'mode':$(this).parent().find('select').val(),'mode_string':$(this).parent().find('.mode_string').val()}, function(html) {
+    var cond = {
+      'url':url,
+      'mode':$(this).parent().parent().parent().find('.mode select').val(),
+      'mode_string':$(this).parent().parent().parent().find('.mode .mode_string').val()
+    };
+    var is_sub = $(this).parent().parent().hasClass("ext_mode");
+    if(is_sub){
+      cond["sub"] = true;
+      cond["ex_mode"] = $(this).parent().parent().find("select").val();
+      cond["ex_string"] = $(this).parent().parent().find(".mode_string").val();
+    }
+    $.get('/services/getPageContent',cond , function(html) {
           $('textarea', form).val(html);
           shadeBackground(true);
           form.fadeIn();
           button.val(chrome_i18n_getMessage('test_button')).add($('.mode_string', record)).attr({ disabled: false });
 
-          cleanAndHashPage(html, mode, mode_string, mode_string, function(crc) {
-            $.get("/services/setPageSettings",{url:url,settings:{ crc: crc }});
-        });
+        //   cleanAndHashPage(html, mode, mode_string, mode_string, function(crc) {
+        //     $.get("/services/setPageSettings",{url:url,settings:{ crc: crc }});
+        // });
     });
   });
 
@@ -912,6 +947,15 @@ function initializePageModeTester() {
     shadeBackground(false);
   });
 }
+
+
+// function initializeAddUrl(){
+//   $('#submit_url').live('click',function() {
+//     $('#urladd').val();
+//     $.get("/services/getPage");
+//     $.get("/services/addPage");
+//   });
+// }
 
 // Initializes the Pick button in the page mode selector. On click, the button
 // spawns a tab with the URL of the page in the its record, then injects jquery,
@@ -950,7 +994,9 @@ function fillPagesList(callback) {
     $('#pages').html('');
 
     if (pages.length > 0) {
-      $.each(pages, function(_, page) { addPageToTable(page); });
+      $.each(pages, function(_, page) { 
+        addPageToTable(page); 
+      });
     } else {
       $('#templates .empty').clone().appendTo('#pages');
     }
@@ -1013,6 +1059,7 @@ function addPageToTable(page) {
     name = name.replace(/([^]{20,60})(\w)\b.*$/, '$1$2...');
   }
 
+  //配置页面标题
   page_record.find('.page_link').attr({
     href: page.url,
     target: '_blank'
@@ -1023,6 +1070,7 @@ function addPageToTable(page) {
   // });
 
   // Last check time ticker.
+  //上次检查时间MARKED
   var last_check_span = page_record.find('.last_check_time');
   last_check_span.bind('time_updated', function() {
     var $span = $(this);
@@ -1041,6 +1089,7 @@ function addPageToTable(page) {
   setInterval(function() { last_check_span.trigger('time_updated'); }, 15000);
 
   // Check interval range slider.
+  //检查间隔
   var interval = check_interval / (60 * 1000);
   var interval_log = timeAbsoluteToLog(interval);
   var interval_div = $('.page_interval', page_record);
@@ -1061,10 +1110,62 @@ function addPageToTable(page) {
     }
   }
 
-  if (page.mode != 'text') {
+  //配置信息的默认显示
+  if (page.mode != '') {
     var mode_div = $('.mode', page_record);
     var mode_string = (page.mode == 'regex') ? page.regex : page.selector;
+    var title_string = (page.title_mode == 'regex') ? page.title_regex : page.title_selector;
+    var author_string = (page.author_mode == 'regex') ? page.author_regex : page.author_selector;
+    var content_string = (page.content_mode == 'regex') ? page.content_regex : page.content_selector;
+    var keyword_string = (page.keyword_mode == 'regex') ? page.keyword_regex : page.keyword_selector;
+    // var time_string = (page.time_mode == 'regex') ? page.time_mode : page.time_selector;
 
+    //标题挑选器
+    if(title_string!=null) {
+      var title_div = $('.page_title', page_record);
+      title_div.children('span').addClass('enabled').removeClass('disabled');
+      $("input[type=checkbox]",title_div).attr({checked:true});
+      $("input,select",title_div).attr({disabled:false});
+      $('select',title_div).val(page.title_mode).change();
+      $('.mode_string',title_div).val(title_string).keyup();
+    }
+    //作者挑选器
+    if(author_string!=null) {
+      var author_div = $('.page_author', page_record);
+      author_div.children('span').addClass('enabled').removeClass('disabled');
+      $("input[type=checkbox]",author_div).attr({checked:true});
+      $("input,select",author_div).attr({disabled:false});
+      $('select',author_div).val(page.author_mode).change();
+      $('.mode_string',author_div).val(author_string).keyup();
+    }
+    //内容挑选器
+    if(content_string!=null) {
+      var content_div = $('.page_content', page_record);
+      content_div.children('span').addClass('enabled').removeClass('disabled');
+      $("input[type=checkbox]",content_div).attr({checked:true});
+      $("input,select",content_div).attr({disabled:false});
+      $('select',content_div).val(page.content_mode).change();
+      $('.mode_string',content_div).val(content_string).keyup();
+    }
+    //关键词挑选器
+    if(keyword_string!=null) {
+      var keyword_div = $('.page_keyword', page_record);
+      keyword_div.children('span').addClass('enabled').removeClass('disabled');
+      $("input[type=checkbox]",keyword_div).attr({checked:true});
+      $("input,select",keyword_div).attr({disabled:false});
+      $('select',keyword_div).val(page.keyword_mode).change();
+      $('.mode_string',keyword_div).val(keyword_string).keyup();
+    }
+    //时间挑选器
+    // if(time_string!=null) {
+    //   var time_div = $('.page_time', page_record);
+    //   time_div.children('span').addClass('enabled').removeClass('disabled');
+    //   $("input[type=checkbox]",time_div).attr({checked:true});
+    //   $("input,select",time_div).attr({disabled:false});
+    //   $('select',time_div).val(page.time_mode).change();
+    //   $('.mode_string',time_div).val(time_string).keyup();
+    // }
+    
     mode_div.children('span').addClass('enabled').removeClass('disabled');
     $('input,select', mode_div).attr({ disabled: false });
     $('input[type=checkbox]', mode_div).attr({ checked: true });

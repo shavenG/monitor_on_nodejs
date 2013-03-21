@@ -1,7 +1,6 @@
 /* Reset */
 
 #chrome_page_monitor_selector, #chrome_page_monitor_selector * {
-  display: block !important;
   position: static !important;
   bottom: auto !important;
   top: auto !important;
@@ -48,12 +47,13 @@
 
 #chrome_page_monitor_selector {
   position: fixed !important;
-  bottom: 0px !important;
+  bottom: 100px !important;
   right: 30px !important;
   background: white !important;
   border: 2px #849ccb solid !important;
-  border-bottom: 0px !important;
-  border-radius: 20px 20px 0px 0px !important;
+ /* border-bottom: 0px !important;
+  border-radius: 20px 20px 0px 0px !important;*/
+  border-radius: 20px 20px 20px 20px !important;
   margin: 0px !important;
   padding: 5px 20px 5px 20px !important;
   padding-top: 5px !important;
