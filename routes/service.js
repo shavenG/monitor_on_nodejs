@@ -49,10 +49,7 @@ exports.getPageContent = function(req, res, sub) {
     var mode_string = req.query.mode_string;
     var ex_mode = req.query.ex_mode;
     var ex_string = req.query.ex_string;
-    // var sub = req.query.sub;
-    // console.log(sub)
     $.get(url, function(html) {
-        // console.log(html.length, mode, mode_string, mode_string);
         BG.cleanPage(html, mode, mode_string, mode_string, function(results) {
             if(sub) return res.send(results);
             BG.getLinksInHtml(results,url,function(links) {
@@ -71,7 +68,20 @@ exports.getPageContent = function(req, res, sub) {
                     res.send(result);
                 }
             });
-            // console.log(links.length,links);
         });
     });
-}
+};
+
+exports.getCountResult = function(req, res) {
+    var result = {};
+    dao.getCurrentDayCount(function(row){
+        result["today_count"] = row.today_count;
+        dao.getReadedCount(1,function(row){
+            result["readed_count"] = row.readed_count;
+            dao.getTotalCount(function(row){
+                result["total_count"] = row.total_count;
+                res.send(result);
+            });
+        });
+    });
+};

@@ -10,6 +10,8 @@
     "iconv":	"1.1.x",
     "feed": "*",
     "feedparser": "*",
-  	"jquery": "*"
+  	"jquery": "*",
+	"sqlite3": "*",
+	"worker":"*"
   }
 }

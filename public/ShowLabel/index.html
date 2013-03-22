@@ -4,7 +4,7 @@
 <!--[if IE 8]>    <html class="no-js lt-ie9" lang="en"> <![endif]-->
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
 <head>
-	<title>Dashboard Admin</title>
+	<title>信息采集系统</title>
 	
 	<meta charset="utf-8">
 	
@@ -14,7 +14,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	
-	<link rel="stylesheet" href="../../../fonts.googleapis.com/css@family=Open+Sans%253A400,600,800">
+	<!-- <link rel="stylesheet" href="../../../fonts.googleapis.com/css@family=Open+Sans%253A400,600,800"> -->
 	<link rel="stylesheet" href="css/font-awesome.css">
 	
 	<link rel="stylesheet" href="css/bootstrap.css">
@@ -26,6 +26,16 @@
 	<link rel="stylesheet" href="css/pages/dashboard.css">
 
 	<script src="js/libs/modernizr-2.5.3.min.js"></script>
+
+	<script type="text/javascript" src="js/libs/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="js/highcharts.js"></script>
+	<script type="text/javascript" src="js/highcharts_count.js"></script>
+
+	<script type="text/javascript">
+		$(function(){
+			
+		});
+	</script>
 
 </head>
 
@@ -45,10 +55,10 @@
 			
 			<ul>
 				<li class="dropdown">
-					<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
+					<!-- <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 						View Your Site				
 						<b class="caret"></b>
-					</a>
+					</a> -->
 					
 					<ul class="dropdown-menu pull-right">
 						<li><a href="javascript:;">View Site #1</a></li>
@@ -66,17 +76,17 @@
 			</ul>
 			
 			<ul class="pull-right">
-				<li><a href="javascript:;"><i class="icon-user"></i> Logged in as John Doe</a></li>
-				<li><a href="javascript:;"><span class="badge badge-primary">1</span> New Message</a></li>
+				<li><a href="javascript:;"><i class="icon-user"></i>您好,欢迎使用信息采集系统</a></li>
+				<li><a href="javascript:;"><span class="badge badge-primary">1</span> 新信息</a></li>
 				<li class="dropdown">
 					<a href="http://wbpreview.com/previews/WB0164888/pages/settings.html" class="dropdown-toggle" data-toggle="dropdown">
-						Settings						
+						设置						
 						<b class="caret"></b>
 					</a>
 					
 					<ul class="dropdown-menu pull-right">
-						<li><a href="javascript:;">Settings #1</a></li>
-						<li><a href="javascript:;">Settings #2</a></li>
+						<li><a href="javascript:;">基本设置</a></li>
+						<!-- <li><a href="javascript:;">Settings #2</a></li>
 						<li class="dropdown-submenu">
 		                  <a tabindex="-1" href="index.html#">Dropdown menu</a>
 		                  <ul class="dropdown-menu">
@@ -84,10 +94,10 @@
 		                    <li><a tabindex="-1" href="index.html#">Second level link</a></li>
 		                    <li><a tabindex="-1" href="index.html#">Second level link</a></li>
 		                  </ul>
-		                </li>
+		                </li> -->
 					</ul> 
 				</li>
-				<li><a href="login.html">Logout</a></li>
+				<li><a href="login.html">注销</a></li>
 			</ul>
 			
 		</div> <!-- /#top-nav -->
@@ -103,7 +113,7 @@
 	
 	<div class="container">
 		
-		<a href="index.html" class="brand">Dashboard Admin</a>
+		<a href="index.html" class="brand">信息采集系统管理</a>
 		
 		<a href="javascript:;" class="btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
         	<i class="icon-reorder"></i>
@@ -114,21 +124,20 @@
 				<li class="nav-icon active">
 					<a href="index.html">
 						<i class="icon-home"></i>
-						<span>Home</span>        					
+						<span>主页</span>        					
 					</a>
 				</li>
 				
 				<li class="dropdown">					
 					<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="icon-th"></i>
-						<span>Components</span> 
+						<span>信息采集</span> 
 						<b class="caret"></b>
 					</a>	
 				
 					<ul class="dropdown-menu">
-						<li><a href="elements.html">Elements</a></li>
-						<li><a href="validation.html">Validation</a></li>
-						<li><a href="jqueryui.html">jQuery UI</a></li>
+						<li><a href="validation.html">采集规则配置</a></li>
+						<!-- <li><a href="jqueryui.html">jQuery UI</a></li>
 						<li><a href="charts.html">Charts</a></li>
 						<li><a href="bonus.html">Bonus Elements</a></li>
 						<li class="dropdown-submenu">
@@ -138,40 +147,40 @@
 		                    <li><a tabindex="-1" href="index.html#">Second level link</a></li>
 		                    <li><a tabindex="-1" href="index.html#">Second level link</a></li>
 		                  </ul>
-		                </li>
+		                </li> -->
 					</ul>    				
 				</li>
 				
 				<li class="dropdown">					
 					<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="icon-copy"></i>
-						<span>Sample Pages</span> 
-						<b class="caret"></b>
+						<span>信息列表</span> 
+						<!-- <b class="caret"></b> -->
 					</a>	
 				
-					<ul class="dropdown-menu">
+					<!-- <ul class="dropdown-menu">
 						<li><a href="faq.html">FAQ</a></li>
 						<li><a href="gallery.html">Image Gallery</a></li>
 						<li><a href="pricing.html">Pricing Plans</a></li>
 						<li><a href="reports.html">Reports</a></li>
 						<li><a href="settings.html">Settings</a></li>
-					</ul>    				
+					</ul>   -->  				
 				</li>
 				
 				<li class="dropdown">					
 					<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown">
 						<i class="icon-external-link"></i>
-						<span>Extras</span> 
-						<b class="caret"></b>
+						<span>选项</span> 
+						<!-- <b class="caret"></b> -->
 					</a>	
 				
-					<ul class="dropdown-menu">							
+					<!-- <ul class="dropdown-menu">							
 						<li><a href="login.html">Login</a></li>
 						<li><a href="signup.html">Signup</a></li>
 						<li><a href="error.html">Error</a></li>
 						<li><a href="skins.html">Skins</a></li>
 						<li><a href="sticky.html">Sticky Footer</a></li>
-					</ul>    				
+					</ul>     -->				
 				</li>
 			</ul>
 			
@@ -191,8 +200,8 @@
 		<div class="masthead-pad">
 			
 			<div class="masthead-text">
-				<h2>Dashboard</h2>
-				<p>You are currently working on 4 projects, with 23 total tasks.</p>
+				<h2>信息采集总览</h2>
+				<!-- <p>采集情况统计图</p> -->
 			</div> <!-- /.masthead-text -->
 			
 		</div>
@@ -211,34 +220,30 @@
 		<div class="row">
 			
 			<div class="span4">
-				<h3>Welcome back, Admin.</h3>
+				<h3>您好，欢迎回来</h3>
 				
-				<p>You are currently signed up to the Free Trial Plan. <br /><a href="javascript:;">Upgrade your plan today</a>.</p>
+				<p>以下是今日信息采集的简要数据统计: <br /><!-- <a href="javascript:;">Upgrade your plan today</a>. --></p>
 				
 				<table class="table stat-table">
 					<tbody>
 						<tr>
-							<td class="value">789</td>
-							<td class="full">Visits Today</td>
+							<td class="value" id="collect"></td>
+							<td class="full">今日采集数</td>
 						</tr>
 						<tr>
-							<td class="value">634</td>
-							<td class="full">Unique Visits</td>
+							<td class="value" id="readed"></td>
+							<td class="full">今日阅读数</td>
 						</tr>
 						<tr>
-							<td class="value">13</td>
-							<td class="full">Pending Comments</td>
-						</tr>
-						<tr>
-							<td class="value">17</td>
-							<td class="full">Support Requests</td>
+							<td class="value" id="total"></td>
+							<td class="full">历史总数</td>
 						</tr>
 					</tbody>
 				</table>
 			</div> <!-- /.span4 -->
 			
 			<div class="span8">
-				<div id="line-chart" class="chart-holder"></div> <!-- /#bar-chart -->
+				<div id="containers" class="chart-holder"></div> <!-- /#bar-chart -->
 			</div> <!-- /.span8 -->
 			
 		</div> <!-- /.row -->

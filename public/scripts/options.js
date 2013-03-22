@@ -869,7 +869,7 @@ function updateSettingDo(event) {
       title_mode:ppp.find(".page_title select").val(),
       author_mode:ppp.find(".page_author select").val(),
       content_mode:ppp.find(".page_content select").val(),
-      keyword_mode:ppp.find(".page_keyword select").val(),
+      // keyword_mode:ppp.find(".page_keyword select").val(),
       // time_mode:ppp.find(".page_time select").val(),
       check_interval:parseFloat(timeLogToAbsolute(parseFloat(ppp.find(".page_interval input[type=range]").val()))) * 60 * 1000,
       updated:0,
@@ -892,7 +892,7 @@ function updateSettingDo(event) {
     mode_obj["author_"+mode_obj["author_mode"]] = ppp.find(".page_author .mode_string").val();
     mode_obj["content_"+mode_obj["content_mode"]] = ppp.find(".page_content .mode_string").val();
     // mode_obj["time_"+mode_obj["time_mode"]] = ppp.find(".page_time  .mode_string").val();
-    mode_obj["keyword_"+mode_obj["keyword_mode"]] = ppp.find(".page_keyword .mode_string").val();
+    mode_obj["keyword_mode"] = ppp.find(".page_keyword .mode_string").val();
     // alert(mode)
     delete(mode_obj["title_"]);
     delete(mode_obj["author_"]);
@@ -1117,7 +1117,8 @@ function addPageToTable(page) {
     var title_string = (page.title_mode == 'regex') ? page.title_regex : page.title_selector;
     var author_string = (page.author_mode == 'regex') ? page.author_regex : page.author_selector;
     var content_string = (page.content_mode == 'regex') ? page.content_regex : page.content_selector;
-    var keyword_string = (page.keyword_mode == 'regex') ? page.keyword_regex : page.keyword_selector;
+    // var keyword_string = (page.keyword_mode == 'regex') ? page.keyword_regex : page.keyword_selector;
+    var keyword_string = page.keyword_mode;
     // var time_string = (page.time_mode == 'regex') ? page.time_mode : page.time_selector;
 
     //标题挑选器
@@ -1153,7 +1154,7 @@ function addPageToTable(page) {
       keyword_div.children('span').addClass('enabled').removeClass('disabled');
       $("input[type=checkbox]",keyword_div).attr({checked:true});
       $("input,select",keyword_div).attr({disabled:false});
-      $('select',keyword_div).val(page.keyword_mode).change();
+      // $('select',keyword_div).val(page.keyword_mode).change();
       $('.mode_string',keyword_div).val(keyword_string).keyup();
     }
     //时间挑选器
@@ -1167,7 +1168,7 @@ function addPageToTable(page) {
     // }
     
     mode_div.children('span').addClass('enabled').removeClass('disabled');
-    $('input,select', mode_div).attr({ disabled: false });
+    // $('input,select', mode_div).attr({ disabled: false });
     $('input[type=checkbox]', mode_div).attr({ checked: true });
     $('select', mode_div).val(page.mode).change();
     $('.mode_string', mode_div).val(mode_string).keyup();
