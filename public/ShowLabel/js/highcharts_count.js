@@ -19,14 +19,24 @@ $(function(){
             yAxis:[{
                 min:0,
                 title:{
-                    text:'条',
-                    rotation: 0
+                    text:'条'
                 },
                 labels:{
                     formatter:function(){
                         return this.value;
                     }
                 }
+            },{
+                min:0,
+                title:{
+                    text:'阅读率'
+                },
+                labels:{
+                    formatter:function(){
+                        return this.value;
+                    }
+                },
+                opposite:1
             }],
             legend:{
                 borderWidth:0.5,
@@ -43,12 +53,17 @@ $(function(){
             },
             series:[{
                 name:"当日采集数",
-                type:"areaspline",
+                type:"column",
                 data:[123,156,219,129,174,205,198]
             },{
                 name:"当日阅读数",
-                type:"areaspline",
+                type:"column",
                 data:[123,106,269,199,194,105,198]
+            },{
+                name:"阅读率",
+                type:"line",
+                yAxis:1,
+                data:[0.5,0.7,0.4,0.9,0.85,0.75,0.85]
             }]
         });
     });

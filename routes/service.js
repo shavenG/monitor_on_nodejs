@@ -85,3 +85,33 @@ exports.getCountResult = function(req, res) {
         });
     });
 };
+
+exports.getInfoListWithPage = function(req, res) {
+    // if(req.query.f == "json"){
+
+    // }
+    var data = {};
+    dao.getTotalCount(function(row) {
+        var total = row.total_count;
+        var page_count = Math.ceil(total / PAGE_PER_COUNT);
+        data["page_count"] = page_count;
+        dao.getLinksWithPage(parseInt(req.query.page),function(rows) {
+            var res_list = [];
+            for(var i = 0; i < rows.length; i++) {
+                var result = {};
+                var author = {};
+                result["title"] = rows[i]["title"] || "";
+                result["description"] = $(rows[i]["content"]).text().substring(0,30) || "";
+                result["link"] = rows[i]["link"] || "";
+                result["image"] = rows[i]["image"] || "";
+                author["name"] = rows[i]["author"] || "";
+                author["email"] = rows[i]["author_email"] || "";
+                result["author"] = author;
+                res_list.push(result);
+            }
+            data["items"] = res_list;
+            res.send(data);
+        });
+    });
+    
+};
