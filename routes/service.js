@@ -93,6 +93,8 @@ exports.getInfoListWithPage = function(req, res) {
     var data = {};
     dao.getTotalCount(function(row) {
         var total = row.total_count;
+        // console.log("total/PAGE_PER_COUNT:",total/PAGE_PER_COUNT);
+        // console.log("\r\nMath.ceil(total/PAGE_PER_COUNT):",Math.ceil(total/PAGE_PER_COUNT));
         var page_count = Math.ceil(total / PAGE_PER_COUNT);
         data["page_count"] = page_count;
         dao.getLinksWithPage(parseInt(req.query.page),function(rows) {

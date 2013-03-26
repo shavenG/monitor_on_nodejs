@@ -73,8 +73,8 @@ app.all('/r/*',function(req, res){
   res.send('<html><body>this is ' + req.originalUrl+'<br /> <a href="r/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>' + '<a href="/r/gen/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>'+'<a href="http://127.0.0.1:3000/r/wanzheng/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a></body></html>');
 });
 
-// BG.watchdog();
-// scan_url_server.startScan();
+BG.watchdog();
+scan_url_server.startScan();
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

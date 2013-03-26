@@ -75,6 +75,7 @@ function findUrl(context) {
 
 
 function ifonloader() {
+  $(".mode_pick").removeAttr("disabled");
   var myIframe = document.getElementById("mainiframe");
   $.get('/scripts/selector.js', function(content) {
     var script = myIframe.contentWindow.document.createElement("script");
@@ -92,6 +93,10 @@ function ifonloader() {
   });
 }
 $(function(){
+  $(".mode_pick").attr("disabled","disabled");
+  $("#zd").click(function(){
+    $(".mode_pick").attr("disabled","disabled");
+  });
   initializePageModeTester();
   $(".mode_pick").click(function(){
     window.frames['mainiframe'].startget($(this).parent().parent().attr("class"));
@@ -105,7 +110,7 @@ $(function(){
   <a name="to$" id="to$"></a>
   <div style='border-bottom:1px solid #999999;'>
     <input id='urlinput' type='text' value='http://www.baidu.com' style="width:678px"/>
-    <input type='button' onclick="$('.mode_string').val('');$('#mainiframe').attr('src','/proxy/'+$('#urlinput').val())" value='转到' style='margin-right:50px' />
+    <input id="zd" type='button' onclick="$('.mode_string').val('');$('#mainiframe').attr('src','/proxy/'+$('#urlinput').val())" value='转到' style='margin-right:50px' />
     链接:
     <span class="wo mode">
       <span class="disabled">
@@ -160,18 +165,16 @@ $(function(){
     </span>
     <br />
 
-    <span class="ext_mode page_keyword">
-      <span class="disabled">关键词:
-      <select>
-        <option value="" class="i18n" title="selector">自动</option>
-        <option value="selector" class="i18n" title="selector">选择器</option>
-        <option value="regex" class="i18n" title="regex">正则</option>
-      </select>
-      <input type="text" class="mode_string" />
-      <input type="button" value="测试" class="mode_test" />
-      <input type="button" value="提取" class="mode_pick" />
+    <div class="ext_mode page_keyword">
+      <span>关键词:　　
+        <select disabled="disabled" style="width:93px;margin-left:2px;">
+          <option value="" title="selector">填写</option>
+        </select>
+        <input type="text" class="mode_string" />
+        <input type="button" value="Test" class="mode_test" disabled="disabled" />
+        <input type="button" value="Pick" class="mode_pick" disabled="disabled" />
       </span>
-    </span>
+    </div>
     <!-- <span class="ext_mode page_time">
       <span class="disabled">时间:
       <select>
