@@ -46,7 +46,7 @@ BROWSER_ICON = "img/browser_icon.png";
 EPSILON = 500;
 WATCHDOG_INTERVAL = 9E5;
 WATCHDOG_TOLERANCE = 12E4;
-MAX_CONNECT_COUNT = 50;
+MAX_CONNECT_COUNT = 20;
 PAGE_PER_COUNT = 10;
 
 var sqlite3 = require('sqlite3').verbose();

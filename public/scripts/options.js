@@ -871,7 +871,7 @@ function updateSettingDo(event) {
       content_mode:ppp.find(".page_content select").val(),
       // keyword_mode:ppp.find(".page_keyword select").val(),
       // time_mode:ppp.find(".page_time select").val(),
-      check_interval:parseFloat(timeLogToAbsolute(parseFloat(ppp.find(".page_interval input[type=range]").val()))) * 60 * 1000,
+      check_interval:(parseFloat(timeLogToAbsolute(parseFloat(ppp.find(".page_interval input[type=range]").val()))) * 60 * 1000) || 60*60*1000,
       updated:0,
     };
 // alert(timeLogToAbsolute(parseFloat(ppp.find(".page_interval input[type=range]").val())))
