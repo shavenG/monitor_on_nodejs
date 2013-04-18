@@ -135,7 +135,6 @@ function setPageRegexOrSelector(url, mode, value, modeext) {
     } else if(mode =='selector') {
       settings.selector = value;
     }
-    
     $.get("/services/setPageSettings",{url:url,settings:settings});
     // }
   // }
@@ -899,7 +898,6 @@ function updateSettingDo(event) {
     delete(mode_obj["keyword_"]);
     // delete(mode_obj["time_"]);
     delete(mode_obj["content_text"]);
-
     setPageRegexOrSelector(url, mode, value, mode_obj);
   // }).live('change', function() { $(this).keyup(); });
   }

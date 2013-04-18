@@ -103,17 +103,20 @@ exports.getInfoListWithPage = function(req, res) {
                 var result = {};
                 var author = {};
                 result["title"] = rows[i]["title"] || "";
-                result["description"] = $(rows[i]["content"]).text().substring(0,30) || "";
+                result["description"] = $("<span>"+rows[i]["content"]+"</span>").text().substring(0,30) || "";
+                result["content"] = rows[i]["content"] || "";
                 result["link"] = rows[i]["link"] || "";
                 result["image"] = rows[i]["image"] || "";
                 author["name"] = rows[i]["author"] || "";
                 author["email"] = rows[i]["author_email"] || "";
                 result["author"] = author;
+                result["keyword"] = "政策研究,农业部";
+                result["time"] = rows[i]["time"];
+                result['id'] = new Date();
                 res_list.push(result);
             }
             data["items"] = res_list;
             res.send(data);
         });
     });
-    
 };

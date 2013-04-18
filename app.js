@@ -1,4 +1,4 @@
-var express = require('express')
+﻿var express = require('express')
   , routes = require('./routes')
   , proxy = require('./routes/proxy')
   , services = require('./routes/service')
@@ -53,9 +53,14 @@ var sqlite3 = require('sqlite3').verbose();
 db = new sqlite3.Database('databases/monitor.db');
 
 app.get('/', routes.index);
-app.get('/services/:method',function(req,res){
-  services[req.params.method](req, res);
-});
+
+try {
+  app.get('/services/:method',function(req,res){
+      services[req.params.method](req, res);
+  });
+} catch (e) {
+  send(500,"500了");
+}
 
 app.all('/proxy/http*',proxy.proxy)
 app.all('*',function(req, res, next){

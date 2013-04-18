@@ -52,12 +52,12 @@
     	//分页代码
     	//额。。貌似写的有点复杂了
     	function activePaging(currentPage) {
-    		window.parent.scrollTo(0,0);
     		currentPage = parseInt(currentPage);
 
     		pagehtml = '<li id="firstpage"><a href="javascript:;">首页</a></li><li id="prevpage"><a href="javascript:;">上一页</a></li>';
 
     		$.get("/services/getInfoListWithPage?page="+currentPage, function(data) {
+    			window.parent.scrollTo(0,0);
     			var page_count = data.page_count;
     			if(currentPage-2 > 0 && currentPage + 2 <= page_count) {
     				for(var i=(currentPage - 2); i <= (currentPage + 2); i++) {
