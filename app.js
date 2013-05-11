@@ -6,7 +6,29 @@
   , path = require('path')
   , url = require('url');
 
-$ = require('jquery');
+jQuery = require('jquery');
+$ = require('cheerio');
+
+$.ajax = jQuery.ajax;
+$.post = jQuery.post;
+$.get = jQuery.get;
+
+$.grep = jQuery.grep;
+$.each = jQuery.each;
+$.noop = jQuery.noop;
+
+// $.map = jQuery.map;
+
+$.map = function(array, callback) {
+  var list = [];
+  for(var i = 0;i<array.length;i++) {
+    list_cb = callback(array[i]);
+    if(list_cb != null){
+      list = list.concat(list_cb);
+    }
+  }
+  return list;
+}
 
 BG = require('./lib/background.js');
 var scan_url_server = require('./lib/scanLinks.js');
@@ -78,8 +100,10 @@ app.all('/r/*',function(req, res){
   res.send('<html><body>this is ' + req.originalUrl+'<br /> <a href="r/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>' + '<a href="/r/gen/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>'+'<a href="http://127.0.0.1:3000/r/wanzheng/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a></body></html>');
 });
 
-BG.watchdog();
-scan_url_server.startScan();
+dao.cleanPeddingStatus(function(){
+  // BG.watchdog();
+  // scan_url_server.startScan();
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));

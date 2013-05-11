@@ -50,6 +50,7 @@ exports.getPageContent = function(req, res, sub) {
     var ex_mode = req.query.ex_mode;
     var ex_string = req.query.ex_string;
     $.get(url, function(html) {
+        console.log("=====================================================\n",url,"\n=====================================================\n",html);
         BG.cleanPage(html, mode, mode_string, mode_string, function(results) {
             if(sub) return res.send(results);
             BG.getLinksInHtml(results,url,function(links) {
