@@ -13,7 +13,7 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<meta name="apple-mobile-web-app-capable" content="yes">
-	
+
 	<link rel="stylesheet" href="css/font-awesome.css">
 	
 	<link rel="stylesheet" href="css/bootstrap.css">
@@ -22,109 +22,29 @@
 	<link rel="stylesheet" href="css/ui-lightness/jquery-ui-1.8.21.custom.css">	
 	
 	<link rel="stylesheet" href="css/application.css">
-	<script type="text/javascript" src="js/DateEnhancer.js"></script>
+
 	<script src="js/libs/modernizr-2.5.3.min.js"></script>
 
 	<script type="text/javascript" src="js/libs/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="js/ly-utils-lib.js"></script>
 
 	<script type="text/javascript">
-	$(function(){
-		var pagehtml = '<li><a href="javascript:;" id="firstpage">首页</a></li><li><a href="javascript:;" id="prevpage">上一页</a></li>';
+		var id = getUrlParameter("id");
+		$.get("/services/getNewById", {"id":id}, function(e) {
+			$(".masthead-text h2").html(e.title);
+			$(".masthead-text p:eq(0)").html("<span class='blod_text'>来源：</span>" + e.author.name.replace(/(^\s*)|(\s*$)/g, "") + "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class='blod_text'>关键词：</span>" + e.keyword);
+			$(".masthead-text p:eq(1)").html("<span class='blod_text'>摘要：</span>" + e.description.replace(/(^\s*)|(\s*$)/g, "") + "......");
+			$(".con_main p").html(e.content);
+		});
+	</script>
 
-    	$.get("/services/getInfoListWithPage?page=1",function(data) {
-    		// var page_count = data.page_count;
-    		// pagehtml += '<li class="active pageclick"><a href="javascript:;">1</a></li>';
-    		// for(var p = 1; p < (page_count>5?5:page_count); p++) {
-    		// 	pagehtml += '<li class="pageclick"><a href="javascript:;">'+ (p+1) +'</a></li>';
-    		// }
-    		// pagehtml += '<li><a href="javascript:;" id="nextpage">下一页</a></li><li><a href="javascript:;" id="lastpage">尾页</a></li>';
-    		// var rows = data.items;
-    		// for(var i = 0; i < rows.length; i++) {
-    		// 	$("#list").html($("#list").html()+"<tr><td width='5%'>"+(i+1)+"</td><td width='22%'>"+rows[i]["link"]+"</td><td width='50%'>"+rows[i]["title"]+"</td><td>"+rows[i]["author"]["name"]+"</td></tr>");
-    		// }
-    		// $(".pagination ul").html(pagehtml);
-
-    		// $(".pageclick").click(function(){
-	    		activePaging(1);
-	    	// });
-    	});
-
-    	//分页代码
-    	//额。。貌似写的有点复杂了
-    	function activePaging(currentPage) {
-    		currentPage = parseInt(currentPage);
-
-    		pagehtml = '<li id="firstpage"><a href="javascript:;">首页</a></li><li id="prevpage"><a href="javascript:;">上一页</a></li>';
-
-    		$.get("/services/getInfoListWithPage?page="+currentPage, function(data) {
-    			window.parent.scrollTo(0,0);
-    			var page_count = data.page_count;
-    			if(currentPage-2 > 0 && currentPage + 2 <= page_count) {
-    				for(var i=(currentPage - 2); i <= (currentPage + 2); i++) {
-    					if(i==currentPage) {
-    						pagehtml += '<li class="pageclick active"><a href="javascript:;">'+ i +'</a></li>';
-    					}else {
-    						pagehtml += '<li class="pageclick"><a href="javascript:;">'+ i +'</a></li>';
-    					}
-    				}
-    			} else {
-    				if(currentPage-2<=0) {
-    					for(var i = 1;i<=(page_count>5?5:page_count);i++) {
-    						if(i==currentPage) {
-    							pagehtml += '<li class="pageclick active"><a href="javascript:;">'+ i +'</a></li>';
-	    					}else {
-	    						pagehtml += '<li class="pageclick"><a href="javascript:;">'+ i +'</a></li>';
-	    					}
-    					}
-    				}else if(currentPage + 2 > page_count) {
-    					for(var i = page_count-4;i<=page_count;i++) {
-    						if(i==currentPage) {
-    							pagehtml += '<li class="pageclick active"><a href="javascript:;">'+ i +'</a></li>';
-	    					}else {
-	    						pagehtml += '<li class="pageclick"><a href="javascript:;">'+ i +'</a></li>';
-	    					}
-    					}
-    				}
-    			}
-    			pagehtml += '<li id="nextpage"><a href="javascript:;">下一页</a></li><li id="lastpage"><a href="javascript:;">尾页</a></li>';
-    			var rows = data.items;
-    			$("#list").html("");
-	    		for(var i = 0; i < rows.length; i++) {
-	    			$("#list").html($("#list").html()+"<tr><td width='5%'>"+rows[i]["id"]+"</td><td width='45%'><a href='news.html?id=" +  rows[i]["id"] + "'>"+rows[i]["title"]+"</a></td><td width='27%'>"+rows[i]["author"]["name"]+"</td><td>"+rows[i]["keyword"]+"</td></tr>");
-	    		}
-    			$(".pagination ul").html(pagehtml);
-
-    			$(".pageclick").click(function(){
-		    		activePaging($(this).text());
-		    	});
-
-		    	$("#firstpage").click(function(){
-		    		activePaging(1);
-		    	});
-
-		    	$("#lastpage").click(function(){
-		    		activePaging(page_count);
-		    	});
-
-		    	$("#nextpage").click(function(){
-		    		if(currentPage + 1 <= page_count){
-		    			activePaging(currentPage + 1);
-		    		}else {
-		    			activePaging(page_count);
-		    		}
-		    	});
-
-		    	$("#prevpage").click(function(){
-		    		if(currentPage - 1>0){
-		    			activePaging(currentPage - 1);
-		    		}else {
-		    			activePaging(1);
-		    		}
-		    	});
-    		});
-    	}
-    });
-    </script>
+	<style type="text/css">
+		.blod_text {
+			font-weight: bold;
+			font-family: 微软雅黑;
+		}
+	</style>
+	
 </head>
 
 <body>
@@ -288,7 +208,9 @@
 		<div class="masthead-pad">
 			
 			<div class="masthead-text">
-				<h2>信息列表</h2>
+				<h2></h2>
+				<p></p>
+				<p></p>
 			</div> <!-- /.masthead-text -->
 			
 		</div>
@@ -298,46 +220,32 @@
 </div> <!-- /#masthead -->
 
 
+
+
 <div id="content">
-	<div class="container">		
+
+	<div class="container">
+		
+		
 		<div class="row">
-			<div class="span12">
-				<!--
-				<select id="validateSelect" name="validateSelect">
-					<option value="1">子链接</option>
-					<option value="2">当前页</option>
-					<option value="3">递归链接</option>
-				</select>
-				-->
-				<section id="tables">
-					<table class="table table-bordered table-striped table-highlight">
-				        <thead>
-				          <tr>
-				            <th>编号</th>
-				            <th>标题</th>
-				            <th>作者</th>
-				            <th>关键词</th>
-				          </tr>
-				        </thead>
-				        <tbody id="list"></tbody>
-				      </table>
-				      <section id="paginations" style="text-align:right;">
-				      	<div class="pagination"><ul></ul></div>
-				      </section>
-						<br />
-						</section>
+			
+			<div class="span6 offset3 con_main" style="">
+				
+					
+				<h2></h2>
+				
+				<p></p>
+				
 				
 			</div> <!-- /.span12 -->
 			
-		</div> <!-- /.row -->
-		
+		</div> <!-- /.row -->		
+	
 	</div> <!-- /.container -->
 
 </div> <!-- /#content -->
 
 </div> <!-- /#wrapper -->
-
-
 
 
 <div id="footer">

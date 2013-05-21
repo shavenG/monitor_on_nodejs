@@ -50,7 +50,6 @@ exports.getPageContent = function(req, res, sub) {
     var ex_mode = req.query.ex_mode;
     var ex_string = req.query.ex_string;
     $.get(url, function(html) {
-        console.log("=====================================================\n",url,"\n=====================================================\n",html);
         BG.cleanPage(html, mode, mode_string, mode_string, function(results) {
             if(sub) return res.send(results);
             BG.getLinksInHtml(results,url,function(links) {
@@ -111,13 +110,33 @@ exports.getInfoListWithPage = function(req, res) {
                 author["name"] = rows[i]["author"] || "";
                 author["email"] = rows[i]["author_email"] || "";
                 result["author"] = author;
-                result["keyword"] = "政策研究,农业部";
+                result["keyword"] = rows[i]["keyword"] || "政策研究,农业部";
                 result["time"] = rows[i]["time"];
-                result['id'] = new Date();
+                result['id'] = rows[i]["id"];
                 res_list.push(result);
             }
             data["items"] = res_list;
             res.send(data);
         });
     });
+};
+
+exports.getNewById = function(req, res) {
+    var id = req.query.id;
+    dao.getNewById(id, function(row) {
+        var result = {};
+        var author = {};
+        result["title"] = row["title"] || "";
+        result["description"] = $("<span>"+row["content"]+"</span>").text().substring(0,60) || "";
+        result["content"] = row["content"] || "";
+        result["link"] = row["link"] || "";
+        result["image"] = row["image"] || "";
+        author["name"] = row["author"] || "";
+        author["email"] = row["author_email"] || "";
+        result["author"] = author;
+        result["keyword"] = row["keyword"] || "政策研究,农业部";
+        result["time"] = row["time"];
+        result['id'] = row["id"];
+        res.send(result);
+    })
 };

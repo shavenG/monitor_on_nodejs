@@ -101,8 +101,8 @@ app.all('/r/*',function(req, res){
 });
 
 dao.cleanPeddingStatus(function(){
-  // BG.watchdog();
-  // scan_url_server.startScan();
+   BG.watchdog();
+   scan_url_server.startScan();
 });
 
 http.createServer(app).listen(app.get('port'), function(){

@@ -1,5 +1,5 @@
 $(function(){
-    $.getJSON("http://localhost:3000/services/getCountResult",function(data){
+    // $.getJSON("http://localhost:3000/services/getCountResult",function(data){
         var chart = new Highcharts.Chart({
             chart:{
                 renderTo :"containers"
@@ -66,5 +66,5 @@ $(function(){
                 data:[0.5,0.7,0.4,0.9,0.85,0.75,0.85]
             }]
         });
-    });
+    // });
 });
