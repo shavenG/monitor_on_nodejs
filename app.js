@@ -95,11 +95,6 @@ app.all('*',function(req, res, next){
   next();
 });
 
-app.all('/r/*',function(req, res){
-  var s = ["录",12,2,3,214,"晨",213123,325,2345,435,34,5435];
-  res.send('<html><body>this is ' + req.originalUrl+'<br /> <a href="r/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>' + '<a href="/r/gen/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a>'+'<a href="http://127.0.0.1:3000/r/wanzheng/'+ s[parseInt(Math.random()*10)]+'">'+ s[ parseInt(Math.random()*10)] +'</a></body></html>');
-});
-
 dao.cleanPeddingStatus(function(){
    BG.watchdog();
    scan_url_server.startScan();
