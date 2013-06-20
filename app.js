@@ -71,7 +71,7 @@ WATCHDOG_TOLERANCE = 12E4;
 MAX_CONNECT_COUNT = 20;
 PAGE_PER_COUNT = 10;
 
-var sqlite3 = require('sqlite3').verbose();
+var sqlite3 = require('sqlite3');
 db = new sqlite3.Database('databases/monitor.db');
 
 app.get('/', routes.index);

@@ -1,4 +1,5 @@
 var Iconv = require("iconv").Iconv;
+var Feed = require('feed');
 
 exports.getAllPages = function(req, res) {
     dao.getAllPages(function(rows) {
@@ -51,18 +52,22 @@ exports.getPageContent = function(req, res, sub) {
     var ex_string = req.query.ex_string;
     $.get(url, function(html) {
         BG.cleanPage(html, mode, mode_string, mode_string, function(results) {
-            if(sub) return res.send(results);
-            BG.getLinksInHtml(results,url,function(links) {
-                if(req.query.sub){
-                    if(links.length>0){
-                        req.query = {"url":links[0].link,"mode":ex_mode,"mode_string":ex_string};
-                        exports.getPageContent(req,res,true);
-                    }else{
+            if (sub) return res.send(results);
+            BG.getLinksInHtml(results, url, function(links) {
+                if (req.query.sub) {
+                    if (links.length > 0) {
+                        req.query = {
+                            "url": links[0].link,
+                            "mode": ex_mode,
+                            "mode_string": ex_string
+                        };
+                        exports.getPageContent(req, res, true);
+                    } else {
                         res.send("无法找到链接");
                     }
-                }else{
+                } else {
                     var result = "";
-                    for(var link_id in links){
+                    for (var link_id in links) {
                         result += links[link_id].title + " ： " + links[link_id].link + "\r\n";
                     }
                     res.send(result);
@@ -74,11 +79,11 @@ exports.getPageContent = function(req, res, sub) {
 
 exports.getCountResult = function(req, res) {
     var result = {};
-    dao.getCurrentDayCount(function(row){
+    dao.getCurrentDayCount(function(row) {
         result["today_count"] = row.today_count;
-        dao.getReadedCount(1,function(row){
+        dao.getReadedCount(1, function(row) {
             result["readed_count"] = row.readed_count;
-            dao.getTotalCount(function(row){
+            dao.getTotalCount(function(row) {
                 result["total_count"] = row.total_count;
                 res.send(result);
             });
@@ -97,13 +102,13 @@ exports.getInfoListWithPage = function(req, res) {
         // console.log("\r\nMath.ceil(total/PAGE_PER_COUNT):",Math.ceil(total/PAGE_PER_COUNT));
         var page_count = Math.ceil(total / PAGE_PER_COUNT);
         data["page_count"] = page_count;
-        dao.getLinksWithPage(parseInt(req.query.page),function(rows) {
+        dao.getLinksWithPage(parseInt(req.query.page), function(rows) {
             var res_list = [];
-            for(var i = 0; i < rows.length; i++) {
+            for (var i = 0; i < rows.length; i++) {
                 var result = {};
                 var author = {};
                 result["title"] = rows[i]["title"] || "";
-                result["description"] = $("<span>"+rows[i]["content"]+"</span>").text().substring(0,30) || "";
+                result["description"] = $("<span>" + rows[i]["content"] + "</span>").text().substring(0, 30) || "";
                 result["content"] = rows[i]["content"] || "";
                 result["link"] = rows[i]["link"] || "";
                 result["image"] = rows[i]["image"] || "";
@@ -121,13 +126,45 @@ exports.getInfoListWithPage = function(req, res) {
     });
 };
 
+exports.getRSS = function(req, res) {
+
+    dao.getLinksWithDate(parseInt(req.query.date), function(rows) {
+        var feed = new Feed({
+            title: 'Feed TEST',
+            link: 'http://www.cmbc.com.cn/',
+            author: {
+                name: 'cmbc',
+                email: 'imd_wind@cmbc.com.cn',
+                link: 'www.cmbc.com.cn'
+            }
+        });
+        for (var i = 0; i < rows.length; i++) {
+            var result = {};
+            var author = {};
+            result["title"] = rows[i]["title"] || "";
+            result["description"] = rows[i]["content"];
+            result["link"] = rows[i]["link"] || "";
+            result["image"] = rows[i]["image"] || "";
+            author["name"] = rows[i]["author"] || "";
+            author["email"] = rows[i]["author_email"] || "";
+            result["author"] = author;
+            result["keyword"] = rows[i]["keyword"] || "政策研究,农业部";
+            result["date"] = new Date(rows[i]["time"]);
+            result['id'] = rows[i]["id"];
+            feed.item(result);
+        }
+        res.setHeader('Content-Type', 'application/xml; charset=UTF-8')
+        res.send(feed.render('atom-1.0').toString());
+    });
+};
+
 exports.getNewById = function(req, res) {
     var id = req.query.id;
     dao.getNewById(id, function(row) {
         var result = {};
         var author = {};
         result["title"] = row["title"] || "";
-        result["description"] = $("<span>"+row["content"]+"</span>").text().substring(0,60) || "";
+        result["description"] = $("<span>" + row["content"] + "</span>").text().substring(0, 60) || "";
         result["content"] = row["content"] || "";
         result["link"] = row["link"] || "";
         result["image"] = row["image"] || "";
